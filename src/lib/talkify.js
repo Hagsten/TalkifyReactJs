@@ -3,50 +3,81 @@ import 'talkify-tts';
 import '../../node_modules/talkify-tts/dist/styles/talkify-common.css';
 import '../../node_modules/talkify-tts/dist/styles/talkify-audiocontrols.css';
 
-class Talkify extends React.Component {
+export class TtsPlayer extends React.Component {
     constructor(props) {
         super(props);
 
-        this.ref = React.createRef();
-    }
+        this.player = new window.talkify.TtsPlayer().enableTextHighlighting();
 
-    componentDidMount() {
-        window.talkify.config = {
-            remoteService: {
-                host: this.props.remoteservice.host,
-                apiKey: this.props.remoteservice.apikey,
-                active: !!this.props.remoteservice //True to use Talkifys language engine and hosted voices. False only works for Html5Player.
-            },
-            ui: {
-                audioControls: {
-                    enabled: !!this.props.controlcenter,
-                    container: this.ref.current//document.body
-                }
-            },
-            keyboardCommands: { //Ctrl + command
-                enabled: false
-            },
-            voiceCommands: {
-                enabled: false
-            }
-        };
-
-        var player = new window.talkify.TtsPlayer().enableTextHighlighting();
-
-        new window.talkify.playlist()
-            .begin()
-            .usingPlayer(player)
-            .withTextInteraction()
-            .withElements(document.querySelectorAll('p')) //<--Any element you'd like. Leave blank to let Talkify make a good guess
-            .build() //<-- Returns an instance.
-            .play();
+        if (this.props.onPlayerCreated) {
+            this.props.onPlayerCreated(this.player);
+        }
     }
 
     render() {
+        return null;
+    }
+}
+
+export class TalkifyPlaylist extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.playlist = null;
+
+        this.onPlayerCreated = this.onPlayerCreated.bind(this);
+    }
+
+    onPlayerCreated(player) {
+        console.log(player);
+
+        var builder = new window.talkify.playlist().begin().usingPlayer(player);
+
+        if (this.props.textinteraction) {
+            builder.withTextInteraction();
+        }
+
+        if (this.props.elements) {
+            builder.withElements(this.props.elements);
+        }
+
+        this.playlist = builder.build();
+    }
+
+    render() {
+
         return (
-            <span>Hello world</span>
+            React.cloneElement(this.props.children, { onPlayerCreated: this.onPlayerCreated })
         );
     }
 }
 
-export default Talkify;
+export class Talkify extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        window.talkify.config.remoteService.host = this.props.remoteservice.host;
+        window.talkify.config.remoteService.apiKey = this.props.remoteservice.apikey;
+        window.talkify.config.remoteService.active = !!this.props.remoteservice;
+
+        window.talkify.config.ui = {
+            audioControls: {
+                enabled: !!this.props.controlcenter
+            }
+        };
+
+        window.talkify.config.keyboardCommands.enabled = false;
+        window.talkify.config.voiceCommands.enabled = false;
+    }
+
+    render() {
+        return (
+            <>
+                <span>Hello world</span>
+                {this.props.children}
+            </>
+        );
+    }
+}

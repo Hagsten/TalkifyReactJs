@@ -1,15 +1,29 @@
 import React from 'react';
 import { render } from "react-dom";
-import { Talkify } from "./lib";
+import { Talkify, TalkifyPlaylist, TtsPlayer } from "./lib";
 
 class App extends React.Component {
     render() {
         var remoteservice = {
-            host: 'https://talkify.net',
-            apikey: "apa"
+            host: 'https://talkify.net/',
+            apikey: "foobar"
         };
 
-        return (<Talkify remoteservice={remoteservice} controlcenter></Talkify>);
+        var usePlaylist = true;
+
+        if (usePlaylist) {
+            return (
+                <Talkify remoteservice={remoteservice} controlcenter>
+                    <TalkifyPlaylist textinteraction elements="p">
+                        <TtsPlayer></TtsPlayer>
+                    </TalkifyPlaylist>
+                </Talkify>);
+        } else {
+            return (
+                <Talkify remoteservice={remoteservice} controlcenter>
+                    <TtsPlayer></TtsPlayer>
+                </Talkify>);
+        }
     }
 }
 
