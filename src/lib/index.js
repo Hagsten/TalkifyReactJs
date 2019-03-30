@@ -1,7 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Talkify, TalkifyPlaylist, TtsPlayer } from "./talkify";
+import { Talkify, TtsPlayer, Html5Player, TalkifyPlaylistItem } from "./talkify";
 
-ReactDOM.render(<div>Hello world</div>, document.getElementById("root"));
+ReactDOM.render(<div>
+    <p>Hello world</p>
+    <p>Hello again</p>
+    </div>, document.getElementById("root"));
 
-export { Talkify, TalkifyPlaylist, TtsPlayer };
+export { Talkify, TtsPlayer, Html5Player, TalkifyPlaylistItem };
