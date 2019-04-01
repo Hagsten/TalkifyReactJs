@@ -6,16 +6,23 @@ import '../../node_modules/talkify-tts/dist/styles/talkify-audiocontrols.css';
 export class TtsPlayer extends React.Component {
     constructor(props) {
         super(props);
+    }
 
-        this.state = {
-            useTextHighlighting: this.props.useTextHighlighting,
-            voice: this.props.voice,
-            play: this.props.play,
-            text: this.props.text
-        };
+    componentDidMount() {
+        if (this.props.voice) {
+            this.props.player.forceVoice(this.props.voice);
+        }
 
-        if (this.props.onPlayerCreated) {
-            this.props.onPlayerCreated(this.player);
+        if (this.props.useTextHighlighting) {
+            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
+        }
+
+        if (this.props.forcedLanguage) {
+            this.props.player.forcedLanguage(this.props.forcedLanguage);
+        }
+
+        if (this.props.play && this.props.text) {
+            this.props.player.playText(this.props.text);
         }
     }
 
@@ -37,12 +44,6 @@ export class TtsPlayer extends React.Component {
         }
     }
 
-    componentDidMount() {
-        if (this.props.play && this.props.text) {
-            this.props.player.playText(this.props.text);
-        }
-    }
-
     componentWillUnmount() {
         this.props.player.dispose();
     }
@@ -55,9 +56,23 @@ export class TtsPlayer extends React.Component {
 export class Html5Player extends React.Component {
     constructor(props) {
         super(props);
+    }
 
-        if (this.props.onPlayerCreated) {
-            this.props.onPlayerCreated(this.player);
+    componentDidMount() {
+        if (this.props.voice) {
+            this.props.player.forceVoice(this.props.voice);
+        }
+
+        if (this.props.useTextHighlighting) {
+            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
+        }
+
+        if (this.props.forcedLanguage) {
+            this.props.player.forcedLanguage(this.props.forcedLanguage);
+        }
+
+        if (this.props.play && this.props.text) {
+            this.props.player.playText(this.props.text);
         }
     }
 
@@ -120,7 +135,7 @@ export class Talkify extends React.Component {
         if (isRemoteVoice) {
             this.player = new window.talkify.TtsPlayer();
         } else {
-            this.player = new window.talkify.Html5PlayerPlayer();
+            this.player = new window.talkify.Html5Player();
         }
 
         if (this.props.playlist) {
@@ -143,17 +158,19 @@ export class Talkify extends React.Component {
     }
 
     componentWillUnmount() {
-        this.playlist.dispose();
+        if (this.playlist) {
+            this.playlist.dispose();
+        }
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.voice !== prevProps.voice) {
             var isRemote = this.__isRemote(this.props.voice);
 
-            if (isRemote && this.player instanceof Html5Player) {
+            if (isRemote && this.player instanceof window.talkify.Html5Player) {
                 this.player = new window.talkify.TtsPlayer();
                 this.playlist.setPlayer(this.player);
-            } else if (!isRemote && this.player instanceof TtsPlayer) {
+            } else if (!isRemote && this.player instanceof window.talkify.TtsPlayer) {
                 this.player = new window.talkify.Html5Player();
                 this.playlist.setPlayer(this.player);
             }
@@ -173,7 +190,7 @@ export class Talkify extends React.Component {
             return !!this.props.remoteservice;
         }
 
-        return voice.constructor.name === "SpeechSynthesisVoice";
+        return voice.constructor.name !== "SpeechSynthesisVoice";
     }
 
     __setConfiguration() {
@@ -200,7 +217,7 @@ export class Talkify extends React.Component {
             <div>
                 {isRemoteVoice ?
                     <TtsPlayer voice={this.props.voice} player={this.player} text={this.props.text} play={this.props.play} /> :
-                    <Html5Player player={this.html5player} voice={this.props.voice} text={this.props.text} play={this.props.play} />}
+                    <Html5Player player={this.player} voice={this.props.voice} text={this.props.text} play={this.props.play} />}
                 {this.props.playlist && React.cloneElement(this.props.children, { playlist: this.playlist })}
             </div>
 

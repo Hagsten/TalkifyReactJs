@@ -9,7 +9,7 @@ class TestItem extends React.Component {
 }
 
 class App extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -17,16 +17,17 @@ class App extends React.Component {
         }
     }
 
-    setAutoVoice(){
-        this.setState({voice : null});
+    setAutoVoice() {
+        this.setState({ voice: null });
     }
 
-    setLocalVoice(){
-        this.setState({voice : null});
+    setLocalVoice() {
+        var voice = window.speechSynthesis.getVoices()[0] || window.speechSynthesis.getVoices()[0];
+        this.setState({ voice: voice });
     }
 
-    setRemoteVoice(){
-        this.setState({voice : null});
+    setRemoteVoice() {
+        this.setState({ voice: { name: "David" } });
     }
 
     render() {
@@ -40,7 +41,7 @@ class App extends React.Component {
             elements: "p"
         };
 
-        var voice = {};
+
 
         var usePlaylist = true;
 
@@ -56,7 +57,7 @@ class App extends React.Component {
                         remoteservice={remoteservice}
                         play={true}
                         playlist={playlist}
-                        voice={voice}>
+                        voice={this.state.voice}>
                         <TalkifyPlaylistItem>
                             <TestItem />
                         </TalkifyPlaylistItem>
