@@ -13,7 +13,12 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            voice: null
+            voice: null,
+            texthighlighting: true,
+            playlist: {
+                textinteraction: true,
+                rootselector: "body"
+            }
         }
     }
 
@@ -30,15 +35,25 @@ class App extends React.Component {
         this.setState({ voice: { name: "David" } });
     }
 
+    toggleTextHighlighting() {
+        this.setState({ texthighlighting: !this.state.texthighlighting });
+    }
+
+    toggleTextInteraction() {
+        var playlist = this.state.playlist;
+        playlist.textinteraction = !playlist.textinteraction;
+
+        this.setState({ playlist: playlist });
+    }
+
+    eventlistener(message, topic){
+        console.log("ReactJs", message, topic);
+    }
+
     render() {
         var remoteservice = {
             host: 'https://talkify.net/',
             apikey: ""
-        };
-
-        var playlist = {
-            useTextInteraction: true,
-            rootselector: "body"
         };
 
         var usePlaylist = true;
@@ -49,6 +64,8 @@ class App extends React.Component {
                     <button onClick={() => this.setAutoVoice()}>Automatic voice</button>
                     <button onClick={() => this.setRemoteVoice()}>Remote voice</button>
                     <button onClick={() => this.setLocalVoice()}>Local voice</button>
+                    <button onClick={() => this.toggleTextHighlighting()}>Toggle text highlighting</button>
+                    <button onClick={() => this.toggleTextInteraction()}>Toggle text interaction</button>
 
                     <p>
                         Hello world, how do you do?</p>
@@ -57,9 +74,10 @@ class App extends React.Component {
                         controlcenter
                         remoteservice={remoteservice}
                         play={true}
-                        useTextHighlighting={true}
-                        playlist={playlist}
-                        voice={this.state.voice}>
+                        useTextHighlighting={this.state.texthighlighting}
+                        playlist={this.state.playlist}
+                        voice={this.state.voice}
+                        eventlistener={this.eventlistener}>
                         <TalkifyPlaylistItem>
                             <TestItem />
                         </TalkifyPlaylistItem>

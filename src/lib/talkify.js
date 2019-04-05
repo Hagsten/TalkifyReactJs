@@ -20,6 +20,10 @@ export class Talkify extends React.Component {
             throw new Error("A talkify instance can not use both a playlist and a text to play.");
         }
 
+        window.talkify.messageHub.subscribe("ReactJsComponent", "*", (message, topic) => {
+            this.props.eventlistener(message, topic);
+        });
+
         var isRemoteVoice = this.__isRemote(this.props.voice);
 
         if (!this.props.remoteservice && isRemoteVoice) {
@@ -41,6 +45,8 @@ export class Talkify extends React.Component {
     }
 
     componentWillUnmount() {
+        window.talkify.messageHub.unsubscribe("ReactJsComponent", "*");
+
         if (this.state.playlist) {
             this.state.playlist.dispose();
         }
@@ -69,6 +75,10 @@ export class Talkify extends React.Component {
             } else {
                 this.__playerDidUpdate(prevProps);
             }
+        }
+
+        if(this.props.playlist){
+            this.props.playlist.textinteraction ? this.state.playlist.enableTextInteraction() : this.state.playlist.disableTextInteraction();
         }
     }
 
@@ -167,7 +177,6 @@ export class Talkify extends React.Component {
     }
 
     render() {
-        console.log(this.props.children);
         return (
             <section>
                 {this.state.playlist && React.cloneElement(this.props.children, { playlist: this.state.playlist })}
