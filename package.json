@@ -6,7 +6,7 @@
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-scripts": "2.1.8",
-    "talkify-tts": "file:talkify-tts-2.5.5.tgz"
+    "talkify-tts": "file:../Talkify-js/talkify-tts-2.5.5.tgz"
   },
   "scripts": {
     "start": "react-scripts start",

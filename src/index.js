@@ -4,7 +4,7 @@ import { Talkify, TtsPlayer, Html5Player, TalkifyPlaylistItem } from "./lib";
 
 class TestItem extends React.Component {
     render() {
-        return (<span>{this.props.item.text}</span>);
+        return (<div>{this.props.item.text}</div>);
     }
 }
 
@@ -38,10 +38,8 @@ class App extends React.Component {
 
         var playlist = {
             useTextInteraction: true,
-            elements: "p"
+            rootselector: "body"
         };
-
-
 
         var usePlaylist = true;
 
@@ -52,10 +50,14 @@ class App extends React.Component {
                     <button onClick={() => this.setRemoteVoice()}>Remote voice</button>
                     <button onClick={() => this.setLocalVoice()}>Local voice</button>
 
+                    <p>
+                        Hello world, how do you do?</p>
+
                     <Talkify
                         controlcenter
                         remoteservice={remoteservice}
                         play={true}
+                        useTextHighlighting={true}
                         playlist={playlist}
                         voice={this.state.voice}>
                         <TalkifyPlaylistItem>

@@ -2,111 +2,7 @@ import React from "react";
 import 'talkify-tts';
 import '../../node_modules/talkify-tts/dist/styles/talkify-common.css';
 import '../../node_modules/talkify-tts/dist/styles/talkify-audiocontrols.css';
-
-export class TtsPlayer extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-        if (this.props.voice) {
-            this.props.player.forceVoice(this.props.voice);
-        }
-
-        if (this.props.useTextHighlighting) {
-            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
-        }
-
-        if (this.props.forcedLanguage) {
-            this.props.player.forcedLanguage(this.props.forcedLanguage);
-        }
-
-        if (this.props.play && this.props.text) {
-            this.props.player.playText(this.props.text);
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.useTextHighlighting !== prevProps.useTextHighlighting) {
-            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
-        }
-
-        if (this.props.voice !== prevProps.voice) {
-            this.props.player.forceVoice(this.props.voice);
-        }
-
-        if (this.props.play !== prevProps.play) {
-            this.props.play ? this.props.player.play() : this.props.player.pause();
-        }
-
-        if (this.props.text !== prevProps.text) {
-            this.props.player.playText(this.props.text);
-        }
-    }
-
-    componentWillUnmount() {
-        this.props.player.dispose();
-    }
-
-    render() {
-        return null;
-    }
-}
-
-export class Html5Player extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-        if (this.props.voice) {
-            this.props.player.forceVoice(this.props.voice);
-        }
-
-        if (this.props.useTextHighlighting) {
-            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
-        }
-
-        if (this.props.forcedLanguage) {
-            this.props.player.forcedLanguage(this.props.forcedLanguage);
-        }
-
-        if (this.props.play && this.props.text) {
-            this.props.player.playText(this.props.text);
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        //TODO: Set rate/volume only supported on html5. Add support for both players before adding support here?
-        if (this.props.useTextHighlighting !== prevProps.useTextHighlighting) {
-            this.props.useTextHighlighting ? this.props.player.enableTextHighlighting() : this.props.player.disableTextHighlighting();
-        }
-
-        if (this.props.voice !== prevProps.voice) {
-            this.props.player.forceVoice(this.props.voice);
-        }
-
-        if (this.props.play !== prevProps.play) {
-            this.props.play ? this.props.player.play() : this.props.player.pause();
-        }
-
-        if (this.props.text !== prevProps.text) {
-            this.props.player.playText(this.props.text);
-        }
-
-        if (this.props.forcedLanguage !== prevProps.forcedLanguage) {
-            this.props.player.forcedLanguage(this.props.forcedLanguage);
-        }
-    }
-
-    componentWillUnmount() {
-        this.props.player.dispose();
-    }
-
-    render() {
-        return null;
-    }
-}
+import '../../node_modules/talkify-tts/dist/styles/talkify-playlist.css';
 
 export class TalkifyPlaylistItem extends React.Component {
     render() {
@@ -138,6 +34,45 @@ export class Talkify extends React.Component {
             this.player = new window.talkify.Html5Player();
         }
 
+        this.state = {
+            isRemoteVoice: isRemoteVoice,
+            playlist: null
+        };
+    }
+
+    componentWillUnmount() {
+        if (this.state.playlist) {
+            this.state.playlist.dispose();
+        }
+
+        this.player.dispose();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.voice !== prevProps.voice) {
+            var isRemote = this.__isRemote(this.props.voice);
+
+            if (isRemote && this.player instanceof window.talkify.Html5Player) {
+                this.player.dispose();
+                this.player = new window.talkify.TtsPlayer();
+
+                this.__playerDidUpdate(prevProps);
+
+                this.state.playlist.setPlayer(this.player);
+            } else if (!isRemote && this.player instanceof window.talkify.TtsPlayer) {
+                this.player.dispose();
+                this.player = new window.talkify.Html5Player();
+
+                this.__playerDidUpdate(prevProps);
+
+                this.state.playlist.setPlayer(this.player);
+            } else {
+                this.__playerDidUpdate(prevProps);
+            }
+        }
+    }
+
+    componentDidMount() {
         if (this.props.playlist) {
             var builder = new window.talkify.playlist().begin().usingPlayer(this.player);
 
@@ -146,43 +81,23 @@ export class Talkify extends React.Component {
             }
 
             if (this.props.playlist.elements) {
-                builder.withElements(this.props.elements);
+                builder.withElements(this.props.playlist.elements);
             }
 
-            this.playlist = builder.build();
-        }
+            if (this.props.playlist.rootselector) {
+                builder.withRootSelector(this.props.playlist.rootselector);
+            }
 
-        this.state = {
-            isRemoteVoice: isRemoteVoice
-        };
-    }
+            var playlist = builder.build();
 
-    componentWillUnmount() {
-        if (this.playlist) {
-            this.playlist.dispose();
-        }
-    }
+            this.setState({ playlist: playlist });
 
-    componentDidUpdate(prevProps) {
-        if (this.props.voice !== prevProps.voice) {
-            var isRemote = this.__isRemote(this.props.voice);
-
-            if (isRemote && this.player instanceof window.talkify.Html5Player) {
-                this.player = new window.talkify.TtsPlayer();
-                this.playlist.setPlayer(this.player);
-            } else if (!isRemote && this.player instanceof window.talkify.TtsPlayer) {
-                this.player = new window.talkify.Html5Player();
-                this.playlist.setPlayer(this.player);
+            if (this.props.play) {
+                playlist.play();
             }
         }
-    }
 
-    componentDidMount() {
-        if (this.props.play) {
-            if (this.props.playlist) {
-                this.playlist.play();
-            }
-        }
+        this.__playerDidMount();
     }
 
     __isRemote(voice) {
@@ -210,16 +125,53 @@ export class Talkify extends React.Component {
         window.talkify.config.voiceCommands.enabled = false;
     }
 
-    render() {
-        var isRemoteVoice = this.__isRemote(this.props.voice);
+    __playerDidMount() {
+        if (this.props.voice) {
+            this.player.forceVoice(this.props.voice);
+        }
 
+        if (this.props.useTextHighlighting) {
+            this.props.useTextHighlighting ? this.player.enableTextHighlighting() : this.player.disableTextHighlighting();
+        }
+
+        if (this.props.forcedLanguage) {
+            this.player.forcedLanguage(this.forcedLanguage);
+        }
+
+        if (this.props.play && this.props.text) {
+            this.player.playText(this.props.text);
+        }
+    }
+
+    __playerDidUpdate(prevProps) {
+        //TODO: Set rate/volume only supported on html5. Add support for both players before adding support here?
+        if (this.props.useTextHighlighting !== prevProps.useTextHighlighting) {
+            this.props.useTextHighlighting ? this.player.enableTextHighlighting() : this.player.disableTextHighlighting();
+        }
+
+        if (this.props.voice !== prevProps.voice) {
+            this.player.forceVoice(this.props.voice);
+        }
+
+        if (this.props.play !== prevProps.play) {
+            this.props.play ? this.player.play() : this.player.pause();
+        }
+
+        if (this.props.text !== prevProps.text) {
+            this.player.playText(this.props.text);
+        }
+
+        if (this.props.forcedLanguage !== prevProps.forcedLanguage) {
+            this.player.forcedLanguage(this.props.forcedLanguage);
+        }
+    }
+
+    render() {
+        console.log(this.props.children);
         return (
-            <div>
-                {isRemoteVoice ?
-                    <TtsPlayer voice={this.props.voice} player={this.player} text={this.props.text} play={this.props.play} /> :
-                    <Html5Player player={this.player} voice={this.props.voice} text={this.props.text} play={this.props.play} />}
-                {this.props.playlist && React.cloneElement(this.props.children, { playlist: this.playlist })}
-            </div>
+            <section>
+                {this.state.playlist && React.cloneElement(this.props.children, { playlist: this.state.playlist })}
+            </section>
 
         );
     }
