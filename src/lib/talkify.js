@@ -64,20 +64,22 @@ export class Talkify extends React.Component {
 
                 this.__playerDidUpdate(prevProps);
 
-                this.state.playlist.setPlayer(this.player);
+                this.__setPlayerOnPlaylist(this.player);
             } else if (!isRemote && this.player instanceof window.talkify.TtsPlayer) {
                 this.player.dispose();
                 this.player = new window.talkify.Html5Player();
 
                 this.__playerDidUpdate(prevProps);
 
-                this.state.playlist.setPlayer(this.player);
+                this.__setPlayerOnPlaylist(this.player);
             } else {
                 this.__playerDidUpdate(prevProps);
             }
+        } else {
+            this.__playerDidUpdate(prevProps);
         }
 
-        if(this.props.playlist){
+        if (this.props.playlist) {
             this.props.playlist.textinteraction ? this.state.playlist.enableTextInteraction() : this.state.playlist.disableTextInteraction();
         }
     }
@@ -110,6 +112,12 @@ export class Talkify extends React.Component {
         this.__playerDidMount();
     }
 
+    __setPlayerOnPlaylist(player) {
+        if (this.state.playlist) {
+            this.state.playlist.setPlayer(player);
+        }
+    }
+
     __isRemote(voice) {
         if (!voice) {
             return !!this.props.remoteservice;
@@ -119,7 +127,7 @@ export class Talkify extends React.Component {
     }
 
     __setConfiguration() {
-        window.talkify.config.debug = true;
+        window.talkify.config.debug = this.props.debugMode || false;
 
         window.talkify.config.remoteService.host = this.props.remoteservice.host;
         window.talkify.config.remoteService.apiKey = this.props.remoteservice.apikey;
@@ -144,8 +152,16 @@ export class Talkify extends React.Component {
             this.props.useTextHighlighting ? this.player.enableTextHighlighting() : this.player.disableTextHighlighting();
         }
 
+        if (this.props.rate !== null && this.props.rate !== undefined) {
+            this.player.setRate(this.props.rate);
+        }
+
         if (this.props.forcedLanguage) {
             this.player.forcedLanguage(this.forcedLanguage);
+        }
+
+        if (this.props.volume !== null && this.props.volume !== undefined && this.player.setVolume) {
+            this.player.setVolume(this.props.volume);
         }
 
         if (this.props.play && this.props.text) {
@@ -154,7 +170,6 @@ export class Talkify extends React.Component {
     }
 
     __playerDidUpdate(prevProps) {
-        //TODO: Set rate/volume only supported on html5. Add support for both players before adding support here?
         if (this.props.useTextHighlighting !== prevProps.useTextHighlighting) {
             this.props.useTextHighlighting ? this.player.enableTextHighlighting() : this.player.disableTextHighlighting();
         }
@@ -163,11 +178,19 @@ export class Talkify extends React.Component {
             this.player.forceVoice(this.props.voice);
         }
 
+        if (this.props.rate !== prevProps.rate) {
+            this.player.setRate(this.props.rate);
+        }
+
+        if (this.props.volume !== prevProps.volume && this.player.setVolume) {
+            this.player.setVolume(this.props.volume);
+        }
+
         if (this.props.play !== prevProps.play) {
             this.props.play ? this.player.play() : this.player.pause();
         }
 
-        if (this.props.text !== prevProps.text) {
+        if (this.props.text !== prevProps.text || this.props.voice !== prevProps.voice) {
             this.player.playText(this.props.text);
         }
 
