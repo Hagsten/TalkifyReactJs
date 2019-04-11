@@ -1,12 +1,12 @@
 {
   "name": "talkify-react-js",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-scripts": "2.1.8",
-    "talkify-tts": "file:../Talkify-js/talkify-tts-2.5.5.tgz"
+    "talkify-tts": "^2.5.5"
   },
   "scripts": {
     "start": "react-scripts start",

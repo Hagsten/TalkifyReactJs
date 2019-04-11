@@ -46,6 +46,7 @@ export class Talkify extends React.Component {
 
     componentWillUnmount() {
         window.talkify.messageHub.unsubscribe("ReactJsComponent", "*");
+        window.talkify.messageHub.unsubscribe("ReactJsComponent", "*.player.*.play");
 
         if (this.state.playlist) {
             this.state.playlist.dispose();
@@ -62,14 +63,14 @@ export class Talkify extends React.Component {
                 this.player.dispose();
                 this.player = new window.talkify.TtsPlayer();
 
-                this.__playerDidUpdate(prevProps);
+                this.__playerDidMount(prevProps);
 
                 this.__setPlayerOnPlaylist(this.player);
             } else if (!isRemote && this.player instanceof window.talkify.TtsPlayer) {
                 this.player.dispose();
                 this.player = new window.talkify.Html5Player();
 
-                this.__playerDidUpdate(prevProps);
+                this.__playerDidMount(prevProps);
 
                 this.__setPlayerOnPlaylist(this.player);
             } else {
@@ -86,7 +87,21 @@ export class Talkify extends React.Component {
 
     componentDidMount() {
         if (this.props.playlist) {
-            var builder = new window.talkify.playlist().begin().usingPlayer(this.player);
+            window.talkify.messageHub.subscribe("ReactJsComponent", "*.player.*.play", message => {
+                var item = message.item;
+
+                var queue = this.state.playlist.getQueue();
+
+                var match = queue.find(x => x === item);
+
+                if (match) {
+                    this.setState({ playlist: this.state.playlist });
+                }
+            });
+
+            var builder = new window.talkify.playlist().begin().usingPlayer(this.player).subscribeTo({
+                onEnded: () => this.setState({ playlist: this.state.playlist })
+            });
 
             if (this.props.playlist.textinteraction) {
                 builder.withTextInteraction();

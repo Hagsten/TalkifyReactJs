@@ -1,11 +1,10 @@
 import React from 'react';
 import { render } from "react-dom";
-import { Talkify, TtsPlayer, Html5Player, TalkifyPlaylistItem } from "./lib";
+import { Talkify, TalkifyPlaylistItem } from "./lib";
 
 class TestItem extends React.Component {
-    //TODO: Solve state update on playlist queue so that we can act on for example isPlaying here. Ideas is to listen to player-events (*.play / *.ended)
     render() {
-        return (<div className={this.props.item.isPlaying ? "playing" : ""}>{this.props.item.text}</div>);
+        return (<div className={this.props.item.isPlaying ? "playlist-playing" : ""}>{this.props.item.text}</div>);
     }
 }
 
@@ -24,6 +23,8 @@ class App extends React.Component {
                 rootselector: "#root"
             }
         }
+
+        window.speechSynthesis.getVoices();
     }
 
     setAutoVoice() {
@@ -31,7 +32,7 @@ class App extends React.Component {
     }
 
     setLocalVoice() {
-        var voice = window.speechSynthesis.getVoices()[0] || window.speechSynthesis.getVoices()[0];
+        var voice = window.speechSynthesis.getVoices()[0];
         this.setState({ voice: voice });
     }
 
@@ -59,13 +60,13 @@ class App extends React.Component {
     }
 
     eventlistener(message, topic) {
-        console.log("ReactJs", message, topic);
+        //console.log("ReactJs", message, topic);
     }
 
     render() {
         var remoteservice = {
             host: 'https://talkify.net/',
-            apikey: ""
+            apikey: "[INSERT-API-KEY-HERE]"
         };
 
         var usePlaylist = true;
@@ -80,8 +81,6 @@ class App extends React.Component {
                 <button onClick={() => this.setRate()}>Set rate to 2</button>
                 <button onClick={() => this.increaseVolume()}>Increase volume</button>
 
-
-
                 {usePlaylist ?
                     <>
                         <p>Hello there, you are now using the playlist feature</p>
@@ -90,7 +89,7 @@ class App extends React.Component {
                             debugMode={this.state.debugMode}
                             controlcenter
                             remoteservice={remoteservice}
-                            play={true}
+                            play={false}
                             useTextHighlighting={this.state.texthighlighting}
                             playlist={this.state.playlist}
                             voice={this.state.voice}
