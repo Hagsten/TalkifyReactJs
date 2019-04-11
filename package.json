@@ -6,6 +6,7 @@
     "talkify-tts": "^2.5.5"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-scripts": "2.1.8"
@@ -27,7 +28,10 @@
   ],
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "files": [ "dist", "README.md" ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Hagsten/TalkifyReactJs"
