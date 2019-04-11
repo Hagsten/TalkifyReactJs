@@ -10,6 +10,8 @@ Font awesome 5
 Refer to https://github.com/Hagsten/Talkify#api for information on what values are accepted. 
 
 ## Usage
+See https://github.com/Hagsten/TalkifyReactJs/blob/master/src/index.js for a full example
+
 ```
 this.state = {
     debugMode: true,
