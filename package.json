@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": false,
   "dependencies": {
+    "talkify-tts": "^2.5.5"
+  },
+  "devDependencies": {
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
-    "react-scripts": "2.1.8",
-    "talkify-tts": "^2.5.5"
+    "react-scripts": "2.1.8"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -22,5 +24,12 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [ "dist", "README.md" ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hagsten/TalkifyReactJs"
+  }
 }
