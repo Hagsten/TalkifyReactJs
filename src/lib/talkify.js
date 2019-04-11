@@ -1,8 +1,5 @@
 import React from "react";
 import 'talkify-tts';
-import '../../node_modules/talkify-tts/dist/styles/talkify-common.css';
-import '../../node_modules/talkify-tts/dist/styles/talkify-audiocontrols.css';
-import '../../node_modules/talkify-tts/dist/styles/talkify-playlist.css';
 
 export class TalkifyPlaylistItem extends React.Component {
     render() {
@@ -20,9 +17,11 @@ export class Talkify extends React.Component {
             throw new Error("A talkify instance can not use both a playlist and a text to play.");
         }
 
-        window.talkify.messageHub.subscribe("ReactJsComponent", "*", (message, topic) => {
-            this.props.eventlistener(message, topic);
-        });
+        if (this.props.eventlistener) {
+            window.talkify.messageHub.subscribe("ReactJsComponent", "*", (message, topic) => {
+                this.props.eventlistener(message, topic);
+            });
+        }
 
         var isRemoteVoice = this.__isRemote(this.props.voice);
 

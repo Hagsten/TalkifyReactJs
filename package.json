@@ -1,21 +1,21 @@
 {
   "name": "talkify-react-js",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": false,
   "dependencies": {
     "talkify-tts": "^2.5.5"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-scripts": "2.1.8"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "SET NODE_ENV=production&& babel src/lib -d dist",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"

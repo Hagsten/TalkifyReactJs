@@ -1,6 +1,9 @@
 import React from 'react';
 import { render } from "react-dom";
 import { Talkify, TalkifyPlaylistItem } from "./lib";
+import '../node_modules/talkify-tts/dist/styles/talkify-common.css';
+import '../node_modules/talkify-tts/dist/styles/talkify-audiocontrols.css';
+import '../node_modules/talkify-tts/dist/styles/talkify-playlist.css';
 
 class TestItem extends React.Component {
     render() {
